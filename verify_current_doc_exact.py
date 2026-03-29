@@ -1,83 +1,96 @@
 # -*- coding: utf-8 -*-
-import sys, io, math
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+import sys, io
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+else:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 print('=' * 72)
-print('当前文档版本 · 精确配方复核')
+print('当前执行文档 · C版（鸭胸强化 + 鲅鱼）精确配方复核')
 print('=' * 72)
 
-# 当前文档 Step 4 的精确用量（不是采购建议圆整值）
+spanish = {
+    '能量': 139, '蛋白质': 19.29, '脂肪': 6.30,
+    '磷': 171, '钙': 11, '铁': 0.44, '锌': 0.51, '铜': 0.046, '锰': 0.015,
+    '钾': 446, '钠': 59, '碘': 35, '硒': 36.5,
+    'VA': 98, 'VD': 16, 'VE': 0.42,
+    'VB1': 0.068, 'VB2': 0.130, 'VB3': 8.47, 'VB6': 0.315, 'VB12': 7.4,
+    '牛磺酸': 70, '花生四烯酸': 60, 'EPA+DHA': 941, '亚油酸': 0.100,
+    '镁': 33, '胆碱': 65, '叶酸': 2, '泛酸': 0.42,
+}
+
 amounts = {
-    '鸡腿肉': 825,
+    '鸡腿肉': 0,
     '猪瘦肉': 600,
     '鸡心': 410,
     '牛心': 445,
     '鸡蛋': 254,
     '鸡肝': 127,
     '牛肝': 95,
-    '鱼': 127,
-    '鸡皮': 285,
+    '鲅鱼': 127,
+    '鸡皮': 222,
+    '鸭胸肉': 900,
 }
 
 nutrients = {
-    '能量': [119,143,153,112,143,119,135,205.4,349],
-    '蛋白质': [19.6,21.1,15.6,17.7,12.6,16.9,20.4,18.6,13.3],
-    '脂肪': [4.3,6.9,9.3,3.9,9.9,4.8,3.6,13.9,32.4],
-    '磷': [178,197,177,212,198,297,387,217,68],
-    '钙': [9,5,12,7,56,8,5,12,11],
-    '铁': [0.8,0.8,5.9,4.3,1.8,9.0,4.9,1.63,0.7],
-    '锌': [1.8,1.9,6.6,2.4,1.3,2.7,4.0,0.63,0.6],
-    '铜': [0.06,0.06,0.33,0.39,0.07,0.49,9.76,0.07,0.02],
-    '锰': [0.02,0.01,0.05,0.03,0.03,0.26,0.31,0.02,0.01],
-    '钾': [242.0,389.0,176.066,286.984,138.0,230.0,313.0,314.0,119.0],
-    '钠': [95.0,52.0,73.934,97.989,142.0,71.0,69.0,90.0,51.0],
-    '碘': [1,1,5,5,27,3,3,44,1],
-    '硒': [23.0,32.5,16.0,21.8,30.7,54.6,39.7,44.1,14.1],
-    'VA': [50,7,31,0,520,11078,16898,167,150],
-    'VD': [5,12,0,0,82,12,49,644,0],
-    'VE': [0.2,0.5,0.7,0.2,1.1,0.7,0.5,1.52,0.3],
-    'VB1': [0.07,0.81,0.13,0.24,0.04,0.31,0.19,0.18,0.01],
-    'VB2': [0.16,0.23,0.73,0.91,0.46,1.78,2.76,0.31,0.07],
-    'VB3': [5.3,5.0,4.8,7.4,0.1,9.7,13.2,9.08,2.5],
-    'VB6': [0.33,0.42,0.29,0.28,0.14,0.85,1.08,0.40,0.05],
-    'VB12': [0.4,0.6,7.3,8.6,0.9,16.6,59.3,8.7,0.3],
-    '牛磺酸': [40,50,145,160,20,30,40,70,10],
-    '花生四烯酸': [50,70,84,25,155,260,200,60,250],
-    'EPA+DHA': [0,0,0,0,0,0,0,2299.1,0],
-    '亚油酸': [0.748,0.49,1.918,0.395,1.554,0.475,0.299,0.219,8.288],
-    '镁': [23,25,15,21,12,19,20,76,10],
-    '胆碱': [65,80,65,150,293,290,333,65,46],
-    '叶酸': [6,1,72,3,47,588,290,1,1],
-    '泛酸': [1.01,0.60,2.51,2.25,1.53,6.50,7.17,0.86,0.53],
+    '能量': [119, 143, 153, 112, 143, 119, 135, spanish['能量'], 349, 135],
+    '蛋白质': [19.6, 21.1, 15.6, 17.7, 12.6, 16.9, 20.4, spanish['蛋白质'], 13.3, 18.28],
+    '脂肪': [4.3, 6.9, 9.3, 3.9, 9.9, 4.8, 3.6, spanish['脂肪'], 32.4, 5.95],
+    '磷': [178, 197, 177, 212, 198, 297, 387, spanish['磷'], 68, 203],
+    '钙': [9, 5, 12, 7, 56, 8, 5, spanish['钙'], 11, 11],
+    '铁': [0.8, 0.8, 5.9, 4.3, 1.8, 9.0, 4.9, spanish['铁'], 0.7, 2.4],
+    '锌': [1.8, 1.9, 6.6, 2.4, 1.3, 2.7, 4.0, spanish['锌'], 0.6, 1.9],
+    '铜': [0.06, 0.06, 0.33, 0.39, 0.07, 0.49, 9.76, spanish['铜'], 0.02, 0.24],
+    '锰': [0.02, 0.01, 0.05, 0.03, 0.03, 0.26, 0.31, spanish['锰'], 0.01, 0.02],
+    '钾': [242.0, 389.0, 176.066, 286.984, 138.0, 230.0, 313.0, spanish['钾'], 119.0, 271.0],
+    '钠': [95.0, 52.0, 73.934, 97.989, 142.0, 71.0, 69.0, spanish['钠'], 51.0, 74.0],
+    '碘': [1, 1, 5, 5, 27, 3, 3, spanish['碘'], 1, 1],
+    '硒': [23.0, 32.5, 16.0, 21.8, 30.7, 54.6, 39.7, spanish['硒'], 14.1, 14.0],
+    'VA': [50, 7, 31, 0, 520, 11078, 16898, spanish['VA'], 150, 24],
+    'VD': [5, 12, 0, 0, 82, 12, 49, spanish['VD'], 0, 0],
+    'VE': [0.2, 0.5, 0.7, 0.2, 1.1, 0.7, 0.5, spanish['VE'], 0.3, 0.7],
+    'VB1': [0.07, 0.81, 0.13, 0.24, 0.04, 0.31, 0.19, spanish['VB1'], 0.01, 0.36],
+    'VB2': [0.16, 0.23, 0.73, 0.91, 0.46, 1.78, 2.76, spanish['VB2'], 0.07, 0.47],
+    'VB3': [5.3, 5.0, 4.8, 7.4, 0.1, 9.7, 13.2, spanish['VB3'], 2.5, 5.3],
+    'VB6': [0.33, 0.42, 0.29, 0.28, 0.14, 0.85, 1.08, spanish['VB6'], 0.05, 0.34],
+    'VB12': [0.4, 0.6, 7.3, 8.6, 0.9, 16.6, 59.3, spanish['VB12'], 0.3, 0.4],
+    '牛磺酸': [40, 50, 145, 160, 20, 30, 40, spanish['牛磺酸'], 10, 0],
+    '花生四烯酸': [50, 70, 84, 25, 155, 260, 200, spanish['花生四烯酸'], 250, 0],
+    'EPA+DHA': [0, 0, 0, 0, 0, 0, 0, spanish['EPA+DHA'], 0, 0],
+    '亚油酸': [0.748, 0.49, 1.918, 0.395, 1.554, 0.475, 0.299, spanish['亚油酸'], 8.288, 0.752],
+    '镁': [23, 25, 15, 21, 12, 19, 20, spanish['镁'], 10, 20],
+    '胆碱': [65, 80, 65, 150, 293, 290, 333, spanish['胆碱'], 46, 64],
+    '叶酸': [6, 1, 72, 3, 47, 588, 290, spanish['叶酸'], 1, 5],
+    '泛酸': [1.01, 0.60, 2.51, 2.25, 1.53, 6.50, 7.17, spanish['泛酸'], 0.53, 1.03],
 }
 
-keys = list(amounts)
 vals = list(amounts.values())
 raw_total = sum(vals)
 finished = raw_total * 0.9
 
 def total(arr):
-    return sum(v/100 * a for v, a in zip(vals, arr))
+    return sum(v / 100 * a for v, a in zip(vals, arr))
 
 food = {name: total(arr) for name, arr in nutrients.items()}
 
 supp = {
     '鱼油热量': 90,
     'EPA+DHA': 3000,
-    '钙': 7200,
+    '钙': 18 * 0.4004 * 1000,
     '铁': 36,
     '锌': 30,
     '锰': 10,
-    '碘': 7*225 + 3*25,
-    '钠': 3000 * 0.3934,
-    'VE': 800*0.67,
+    '碘': 7 * 225 + 3 * 25,
+    '钠': 3 * 0.3934 * 1000,
+    'VE': 8 * 100 * 0.6711,
+    'VD_extra': 1000,
     'VB1': 100,
     'VB2': 100,
     'VB3': 100,
     'VB6': 100,
     'VB12': 100,
     '牛磺酸': 3000,
-    '氯化物': 3000 * 0.6066,
+    '氯化物': 3 * 0.6066 * 1000,
     '叶酸': 800,
     '泛酸': 100,
 }
@@ -99,7 +112,7 @@ final = {
     '硒': food['硒'],
     '牛磺酸': food['牛磺酸'] * 0.4 + supp['牛磺酸'],
     'VA': food['VA'],
-    'VD': food['VD'],
+    'VD': food['VD'] + supp['VD_extra'],
     'VE': food['VE'] + supp['VE'],
     'VB1': food['VB1'] + supp['VB1'],
     'VB2': food['VB2'] + supp['VB2'],
@@ -116,10 +129,18 @@ final = {
     '泛酸': food['泛酸'] + supp['泛酸'],
 }
 
+expected = {
+    'raw_total': 3180,
+    'finished': 2862.0,
+    'kcal': 4882.6,
+    'density': 1.706,
+    'ca_p': 1.209,
+}
+
 print(f'原料总量: {raw_total} g')
 print(f'成品重量(90%出成率): {finished:.1f} g')
-print(f'总能量(含鱼油): {kcal:.1f} kcal')
-print(f'能量密度: {kcal/finished:.3f} kcal/g')
+print(f'总能量(含鱼油+VD3): {kcal:.1f} kcal')
+print(f'能量密度: {kcal / finished:.3f} kcal/g')
 print()
 
 checks = [
@@ -156,7 +177,7 @@ checks = [
 
 issues = []
 print(f"{'营养素':<10} {'每1000kcal':>12} {'NRC最低':>10} {'NRC上限':>10}  状态")
-print('-'*62)
+print('-' * 62)
 for name, low, high, unit in checks:
     value = per1k(final[name])
     ok = value >= low and (high is None or value <= high)
@@ -166,31 +187,35 @@ for name, low, high, unit in checks:
     print(f"{name:<10} {value:>12.1f} {low:>10g} {high_text:>10}  {'✅' if ok else '❌'}")
 
 print()
-print(f"Ca:P = {final['钙']:.1f}/{final['磷']:.1f} = {final['钙']/final['磷']:.3f}")
-print(f"牛磺酸/kg成品 = {final['牛磺酸']/(finished/1000):.1f} mg/kg")
-print(f"钾总量 = {final['钾']:.1f} mg -> {per1k(final['钾']):.1f}/1000kcal")
-print(f"钠总量 = {final['钠']:.1f} mg -> {per1k(final['钠']):.1f}/1000kcal")
-print(f"食材天然碘 = {food['碘']:.1f} mcg")
-print(f"总碘 = {final['碘']:.1f} mcg -> {per1k(final['碘']):.1f}/1000kcal")
-print(f"维生素A总量 = {food['VA']:.1f} IU -> {per1k(food['VA']):.1f}/1000kcal")
+print(f"Ca:P = {final['钙']:.1f}/{final['磷']:.1f} = {final['钙'] / final['磷']:.3f}")
+print(f"牛磺酸/kg成品 = {final['牛磺酸'] / (finished / 1000):.1f} mg/kg")
+print(f"维生素D总量 = {final['VD']:.1f} IU -> {per1k(final['VD']):.1f}/1000kcal")
 print(f"EPA+DHA总量 = {final['EPA+DHA']:.1f} mg -> {per1k(final['EPA+DHA']):.1f}/1000kcal")
-print(f"亚油酸总量 = {final['亚油酸']:.2f} g -> {per1k(final['亚油酸']):.2f}/1000kcal")
-print(f"氯化物总量 = {final['氯化物']:.1f} mg -> {per1k(final['氯化物']):.1f}/1000kcal")
-print(f"镁总量 = {final['镁']:.1f} mg -> {per1k(final['镁']):.1f}/1000kcal")
-print(f"胆碱总量 = {final['胆碱']:.1f} mg -> {per1k(final['胆碱']):.1f}/1000kcal")
-print(f"叶酸总量 = {final['叶酸']:.1f} mcg -> {per1k(final['叶酸']):.1f}/1000kcal")
-print(f"泛酸总量 = {final['泛酸']:.1f} mg -> {per1k(final['泛酸']):.1f}/1000kcal")
 
 catfood_kcal_per_g = kcal / finished
-cat_a = 30*4.0 + 60*catfood_kcal_per_g
-cat_b = 30*4.0 + 50*catfood_kcal_per_g
-cat_c = 40*4.0 + 80*catfood_kcal_per_g
-print(f"分猫能量: A={cat_a:.1f}, B={cat_b:.1f}, C={cat_c:.1f}, 合计={cat_a+cat_b+cat_c:.1f} kcal/天")
+cat_a = 30 * 4.0 + 60 * catfood_kcal_per_g
+cat_b = 30 * 4.0 + 50 * catfood_kcal_per_g
+cat_c = 40 * 4.0 + 80 * catfood_kcal_per_g
+print(f"分猫能量: A={cat_a:.1f}, B={cat_b:.1f}, C={cat_c:.1f}, 合计={cat_a + cat_b + cat_c:.1f} kcal/天")
+
+meta_issues = []
+if raw_total != expected['raw_total']:
+    meta_issues.append(f"原料总量={raw_total}，预期={expected['raw_total']}")
+if abs(finished - expected['finished']) > 0.5:
+    meta_issues.append(f"成品重量={finished:.1f}，预期={expected['finished']:.1f}")
+if abs(kcal - expected['kcal']) > 0.2:
+    meta_issues.append(f"总能量={kcal:.1f}，预期={expected['kcal']:.1f}")
+if abs(kcal / finished - expected['density']) > 0.002:
+    meta_issues.append(f"能量密度={kcal / finished:.3f}，预期={expected['density']:.3f}")
+if abs(final['钙'] / final['磷'] - expected['ca_p']) > 0.002:
+    meta_issues.append(f"Ca:P={final['钙'] / final['磷']:.3f}，预期={expected['ca_p']:.3f}")
 
 print()
-if issues:
-    print(f'未达标: {len(issues)} 项')
+if issues or meta_issues:
+    print(f'存在 {len(issues)} 项 NRC 问题，{len(meta_issues)} 项元数据偏差')
     for row in issues:
         print(row)
+    for row in meta_issues:
+        print(row)
 else:
-    print('29/29 核心营养指标达标')
+    print('当前 C 版配方与现行执行文档一致，29/29 核心营养指标达标')

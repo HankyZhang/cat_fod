@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+历史验证脚本（归档保留）
+
+本脚本对应早期“青口贝 + 9%鸡皮”口径，已不代表现行执行版。
+现行执行与复核请改用：
+- `verify_all_versions.py`
+- `verify_current_doc_exact.py`
+- `verify_spanish_mackerel.py`
+"""
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 import math

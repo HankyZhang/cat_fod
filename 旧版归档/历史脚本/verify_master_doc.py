@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-完整重新验证脚本
-1. 检查代码数组 vs 文档实际配方是否一致
-2. 用文档的实际配方重新计算全部29项NRC
-3. 验证鸡皮替换问题
+历史诊断脚本（归档保留）
+
+用途：排查旧阶段“代码数组 vs 文档实际配方”是否一致。
+该脚本保留用于代码考古和历史复盘，不作为现行执行入口。
 """
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')

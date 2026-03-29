@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+历史版本对比脚本（归档保留）
+
+比较对象是旧 9% 鸡皮 / 旧 A-B-C 版本，数值已不是现行鲅鱼总版口径。
+仅用于查看早期演化过程。
+"""
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 

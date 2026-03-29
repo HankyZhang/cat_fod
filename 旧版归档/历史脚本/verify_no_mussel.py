@@ -1,3 +1,9 @@
+"""
+历史过渡脚本（归档保留）
+
+本脚本对应“去掉青口贝、改用锰片”的过渡阶段，仍是旧口径，
+不代表当前统一执行总版。
+"""
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 

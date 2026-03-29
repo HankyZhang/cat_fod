@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+历史验证脚本（归档保留）
+
+本脚本对应早期“修正后最终版”旧口径，仍包含青口贝/旧鱼种数据，
+不再作为现行配方依据。
+"""
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 

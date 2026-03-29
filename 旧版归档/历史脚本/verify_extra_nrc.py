@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-补充验证：NRC 2006 中当前主脚本未覆盖的 5 项必需营养素
-氯化物(Cl)、镁(Mg)、胆碱(Choline)、叶酸(Folate)、泛酸(Pantothenic acid)
+历史补充验证脚本（归档保留）
+
+本脚本基于旧大西洋鲭鱼/旧鸡皮口径，用来补充验证 5 项额外营养素。
+现行总版已在主校验脚本中覆盖这些指标，因此本脚本仅保留作历史参考。
 """
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
